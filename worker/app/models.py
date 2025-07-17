@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional, List, Union
 
 class NotificationRequest(BaseModel):
-    ApplicationID: str
+    Application: str
     OutputType: str
     Subject: Optional[str]
     Message: str
