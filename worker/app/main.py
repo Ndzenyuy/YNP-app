@@ -12,7 +12,7 @@ def run_worker():
         for msg in messages:
             try:
                 body = json.loads(msg["Body"])
-                app_cfg = get_app_config(body["ApplicationID"])
+                app_cfg = get_app_config(body["Application"])
                 if not app_cfg:
                     raise Exception("App config not found")
 
@@ -26,11 +26,11 @@ def run_worker():
                 else:
                     raise Exception("Invalid OutputType")
 
-                log_request(body["ApplicationID"], body, status="success")
+                log_request(body["Application"], body, status="success")
                 delete_message(msg["ReceiptHandle"])
 
             except Exception as e:
-                log_request(body.get("ApplicationID", "unknown"), body, status="failed", error=str(e))
+                log_request(body.get("Application", "unknown"), body, status="failed", error=str(e))
 
         time.sleep(2)
 
