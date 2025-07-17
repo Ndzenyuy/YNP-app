@@ -26,14 +26,14 @@ def setup_app_services(app):
     dkim_tokens = dkim_response["DkimTokens"]
 
     # Create SNS topic
-    sns_response = sns.create_topic(Name=app.ApplicationID)
+    sns_response = sns.create_topic(Name=app.Application)
     sns_arn = sns_response["TopicArn"]
 
     ses_arn = f"arn:aws:ses:{settings.AWS_REGION}:{settings.AWS_ACCOUNT_ID}:identity/{domain}"
 
     return {
         "App name": app.App_name,
-        "ApplicationID": app.ApplicationID,
+        "Application": app.Application,
         "Email": app.Email,
         "Domain": domain,
         "SES-Domain-ARN": ses_arn,

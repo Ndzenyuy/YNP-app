@@ -11,13 +11,13 @@ def get_dynamodb():
 
 def get_app_config(application_id: str):
     table = get_dynamodb().Table(settings.APP_CONFIG_TABLE)
-    resp = table.get_item(Key={"ApplicationID": application_id})
+    resp = table.get_item(Key={"Application": application_id})
     return resp.get("Item")
 
 def log_request(application_id: str, payload: dict, status: str, error: str = None):
     table = get_dynamodb().Table(settings.REQUEST_LOG_TABLE)
     item = {
-        "ApplicationID": application_id,
+        "Application": application_id,
         "Message": payload["Message"],
         "Status": status,
         "OutputType": payload["OutputType"],

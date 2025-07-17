@@ -7,7 +7,7 @@ app = FastAPI()
 
 class AppRequest(BaseModel):
     App_name: str
-    ApplicationID: str
+    Application: str
     Email: EmailStr
     Domain: str
 
