@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack
+    ports:
+      - "4566:4566"     # LocalStack gateway for all AWS APIs
+      - "4571:4571"
+    environment:
+      - SERVICES=sqs,ses,sns,dynamodb
+      - DEBUG=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  admin:
+    build:
+      context: ./admin
+    container_name: admin
+    env_file: ./admin/.env
+    depends_on:
+      - localstack
+    ports:
+      - "8001:8001"
+
+  requestor:
+    build:
+      context: ./requestor
+    container_name: requestor
+    env_file: ./requestor/.env
+    depends_on:
+      - localstack
+    ports:
+      - "8000:8000"
+
+  worker:
+    build:
+      context: ./worker
+    container_name: worker
+    env_file: ./worker/.env
+    depends_on:
+      - localstack
