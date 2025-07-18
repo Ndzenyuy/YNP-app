@@ -1,0 +1,66 @@
+source venv/bin/activate
+
+docker-compose build --no-cache
+docker-compose up -d
+
+
+docker-compose down --volumes --remove-orphans
+docker system prune -af
+docker volume prune -f
+
+docker-compose build --no-cache
+docker-compose up -d
+
+
+curl -X POST http://localhost:8000/requester \
+  -H "Content-Type: application/json" \
+  -d '{
+    "Application": "App2",
+    "Recipient": "user@example.com",
+    "Subject": "Test Subject",
+    "Message": "Hello, this is a test message!",
+    "OutputType": "EMAIL",
+    "Interval": {
+      "Once": true
+    },
+    "EmailAddresses": ["user@example.com"]
+  }'
+
+
+curl -X POST http://localhost:8000/requester \
+  -H "Content-Type: application/json" \
+  -d '{
+    "Application": "App1",
+    "Recipient": "1234567890",
+    "Subject": "Test SMS",
+    "Message": "This is an SMS test.",
+    "OutputType": "SMS",
+    "PhoneNumber": "+15555555555",
+    "Interval": {
+      "Days": [1, 15]
+    }
+  }'
+
+curl -X POST http://localhost:8000/requester \
+  -H "Content-Type: application/json" \
+  -d '{
+    "Application": "App1",
+    "Recipient": "pushUser1",
+    "Subject": "New Alert",
+    "Message": "You have a new notification!",
+    "OutputType": "PUSH",
+    "PushToken": "example_token_123",
+    "Interval": {
+      "Weeks": [2, 4]
+    }
+  }'
+
+
+http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/notifications-queue
+
+aws --endpoint-url=http://localhost:4566 sqs receive-message \
+  --queue-url http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/notifications-queue \
+  --max-number-of-messages 10 \
+  --visibility-timeout 0 \
+  --wait-time-seconds 1
+

@@ -9,6 +9,7 @@ class Settings:
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
     AWS_ACCOUNT_ID = os.getenv("AWS_ACCOUNT_ID")
     APP_CONFIG_TABLE = os.getenv("APP_CONFIG_TABLE", "Applications")
+    AWS_ENDPOINT = os.getenv("AWS_ENDPOINT", "http://localstack:4566")
 
 settings = Settings()
 
