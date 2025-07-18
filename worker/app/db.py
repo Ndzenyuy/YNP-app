@@ -1,30 +1,22 @@
 import boto3
-from .config import settings
+from datetime import datetime
+from . import config
 
-def get_dynamodb():
-    return boto3.resource(
-        "dynamodb",
-        region_name=settings.AWS_REGION,
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
-    )
+dynamodb = boto3.resource(
+    "dynamodb",
+    region_name=config.AWS_REGION,
+    aws_access_key_id=config.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=config.AWS_SECRET_ACCESS_KEY,
+    endpoint_url=config.ENDPOINT_URL
+)
 
-def get_app_config(application_id: str):
-    table = get_dynamodb().Table(settings.APP_CONFIG_TABLE)
-    resp = table.get_item(Key={"Application": application_id})
-    return resp.get("Item")
-
-def log_request(application_id: str, payload: dict, status: str, error: str = None):
-    table = get_dynamodb().Table(settings.REQUEST_LOG_TABLE)
-    item = {
-        "Application": application_id,
-        "Message": payload["Message"],
+def log_request(app_id, message, status, error=""):
+    table = dynamodb.Table(config.REQUEST_LOG_TABLE)
+    table.put_item(Item={
+        "ApplicationID": app_id,
+        "Timestamp": datetime.utcnow().isoformat(),
         "Status": status,
-        "OutputType": payload["OutputType"],
-        "EmailAddresses": payload.get("EmailAddresses"),
-        "PhoneNumber": payload.get("PhoneNumber"),
-        "PushToken": payload.get("PushToken"),
+        "Payload": message,
         "Error": error
-    }
-    table.put_item(Item=item)
+    })
 

@@ -1,39 +1,31 @@
-import time
 import json
-from .sqs_client import receive_messages, delete_message
-from .db import get_app_config, log_request
-from .handlers import send_email, send_sms, send_push
-from .config import settings
+import time
+from . import sqs, notifier, db
 
 def run_worker():
-    print("[✓] Worker running and polling SQS...")
+    print("[✓] Worker started and polling...")
+
     while True:
-        messages = receive_messages()
-        print(f"[✓] Received: {messages}")
+        messages = sqs.poll_messages()
+
         for msg in messages:
             try:
                 body = json.loads(msg["Body"])
-                app_cfg = get_app_config(body["Application"])
+                app_id = body.get("Application")
+                app_cfg = notifier.get_app_config(app_id)
+
                 if not app_cfg:
-                    raise Exception("App config not found")
+                    raise Exception(f"App config not found for {app_id}")
 
-                body["Region"] = settings.AWS_REGION
-                if body["OutputType"] == "email":
-                    send_email(app_cfg, body)
-                elif body["OutputType"] == "sms":
-                    send_sms(app_cfg, body)
-                elif body["OutputType"] == "push":
-                    send_push(app_cfg, body)
-                else:
-                    raise Exception("Invalid OutputType")
-
-                log_request(body["Application"], body, status="success")
-                delete_message(msg["ReceiptHandle"])
+                notifier.send_notification(app_cfg, body)
+                db.log_request(app_id, body, "delivered")
+                sqs.delete_message(msg["ReceiptHandle"])
 
             except Exception as e:
-                log_request(body.get("Application", "unknown"), body, status="failed", error=str(e))
+                db.log_request(body.get("Application", "unknown"), body, "failed", str(e))
+                print(f"[✗] Error: {str(e)}")
 
-        time.sleep(2)
+        time.sleep(3)
 
 if __name__ == "__main__":
     run_worker()
