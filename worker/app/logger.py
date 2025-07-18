@@ -1,3 +1,6 @@
+import sys
+
 def log(msg):
-    print(f"[✓] {msg}")
+    sys.stdout.write(f"[✓] {msg}\n")
+    sys.stdout.flush()
 
