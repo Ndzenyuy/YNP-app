@@ -1,31 +1,31 @@
 import json
-import time
-from . import sqs, notifier, db
+from . import sqs_client, dynamodb_client, notifier, logger
 
 def run_worker():
-    print("[✓] Worker started and polling...")
-
+    logger.log("Worker started polling SQS...")
     while True:
-        messages = sqs.poll_messages()
-
+        messages = sqs_client.poll_messages()
         for msg in messages:
             try:
                 body = json.loads(msg["Body"])
-                app_id = body.get("Application")
-                app_cfg = notifier.get_app_config(app_id)
+                app_id = body["Application"]
+                cfg = dynamodb_client.get_application_config(app_id)
+                if not cfg:
+                    raise Exception("App config not found")
 
-                if not app_cfg:
-                    raise Exception(f"App config not found for {app_id}")
+                output = body.get("OutputType")
+                if output == "EMAIL":
+                    notifier.send_email(cfg["SES-Domain-ARN"], body["EmailAddresses"], body["Subject"], body["Message"])
+                elif output in ["SMS", "PUSH"]:
+                    notifier.send_sns(cfg["SNS-Topic-ARN"], body["Message"])
+                else:
+                    raise Exception("Unsupported OutputType")
 
-                notifier.send_notification(app_cfg, body)
-                db.log_request(app_id, body, "delivered")
-                sqs.delete_message(msg["ReceiptHandle"])
-
+                dynamodb_client.log_request(app_id, body, "delivered")
+                sqs_client.delete_message(msg["ReceiptHandle"])
             except Exception as e:
-                db.log_request(body.get("Application", "unknown"), body, "failed", str(e))
-                print(f"[✗] Error: {str(e)}")
-
-        time.sleep(3)
+                dynamodb_client.log_request(body.get("Application", "unknown"), body, "failed", str(e))
+                logger.log(f"Error: {e}")
 
 if __name__ == "__main__":
     run_worker()
