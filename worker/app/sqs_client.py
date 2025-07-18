@@ -9,8 +9,7 @@ def get_sqs_client():
         "sqs",
         region_name=settings.AWS_REGION,
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        endpoint_url="http://localstack:4566"  
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,         
     )
 
 def receive_messages(max_messages=5):
