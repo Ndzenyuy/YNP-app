@@ -16,6 +16,7 @@ def notify(req: NotificationRequest):
     try:
         response = send_message_to_queue(req.dict())
         logging.info(f"NotificationRequest payload: {response}")
+        print(f"NotificationRequest payload: {response}")
         return {
             "message_id": response.get("MessageId"),
             "status": "queued"
