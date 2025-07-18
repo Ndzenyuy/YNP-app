@@ -9,7 +9,7 @@ class NotificationRequest(BaseModel):
     Date: Optional[str]
     Time: Optional[str]
     Interval: dict
-    EmailTo: Optional[Union[str, List[str]]]
+    EmailAddresses: Optional[Union[str, List[str]]]
     PhoneNumber: Optional[str]
     PushToken: Optional[str]
 

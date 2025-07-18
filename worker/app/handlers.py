@@ -2,7 +2,7 @@ import boto3
 
 def send_email(cfg, req):
     ses = boto3.client("ses", region_name=cfg["Region"])
-    destination = req["EmailTo"] if isinstance(req["EmailTo"], list) else [req["EmailTo"]]
+    destination = req["EmailAddresses"] if isinstance(req["EmailAddresses"], list) else [req["EmailAddresses"]]
     return ses.send_email(
         Source=cfg["Email"],
         Destination={"ToAddresses": destination},

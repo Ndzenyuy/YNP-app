@@ -21,7 +21,7 @@ def log_request(application_id: str, payload: dict, status: str, error: str = No
         "Message": payload["Message"],
         "Status": status,
         "OutputType": payload["OutputType"],
-        "EmailTo": payload.get("EmailTo"),
+        "EmailAddresses": payload.get("EmailAddresses"),
         "PhoneNumber": payload.get("PhoneNumber"),
         "PushToken": payload.get("PushToken"),
         "Error": error
