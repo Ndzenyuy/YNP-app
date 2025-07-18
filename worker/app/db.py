@@ -7,7 +7,7 @@ dynamodb = boto3.resource(
     region_name=config.AWS_REGION,
     aws_access_key_id=config.AWS_ACCESS_KEY_ID,
     aws_secret_access_key=config.AWS_SECRET_ACCESS_KEY,
-    endpoint_url=config.ENDPOINT_URL
+    endpoint_url=config.AWS_ENDPOINT
 )
 
 def log_request(app_id, message, status, error=""):
