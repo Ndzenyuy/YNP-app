@@ -9,6 +9,7 @@ def run_worker():
     print("[✓] Worker running and polling SQS...")
     while True:
         messages = receive_messages()
+        print(f"[✓] Received: {messages}")
         for msg in messages:
             try:
                 body = json.loads(msg["Body"])
