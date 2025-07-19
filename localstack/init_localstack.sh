@@ -24,7 +24,7 @@ awslocal dynamodb create-table \
 awslocal dynamodb put-item \
   --table-name Applications \
   --item '{
-    "Application": {"S": "App2"},
+    "Application": {"S": "App1"},
     "AppName": {"S": "CHA - Student Platform"},
     "Email": {"S": "no-reply@cha.com"},
     "Domain": {"S": "cha.com"},
